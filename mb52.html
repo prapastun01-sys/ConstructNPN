@@ -90,7 +90,7 @@ tr.mat-band td { background: #f7e6c8; font-weight: bold; border-top: 2px solid #
 </div>
 
 <div class="container">
-  <div class="header-title">🏬 คงคลังพัสดุ MB52 <small id="plantHeadNote">โรงงาน D060 (ค่าเริ่มต้น)</small></div>
+  <div class="header-title">🏬 คงคลังพัสดุ MB52 <small id="plantHeadNote">โรงงาน D050 (ค่าเริ่มต้น)</small></div>
 
   <div class="filter-grid">
     <div>
@@ -196,7 +196,7 @@ tr.mat-band td { background: #f7e6c8; font-weight: bold; border-top: 2px solid #
 // ── Config ──
 // ที่เก็บที่ใช้คำนวณ "สต็อก" ในหน้าตารางความต้องการ (ตรงกับ target_locs ใน run.py)
 const DEMAND_LOCS = ['0021', '0022', '0023', '0024', '0025', '6001', '6002', '6003', '6004', '6006', '6007', '6008', '6009', '6010', '6011'];
-const DEFAULT_PLANT = 'D060';   // โรงงานเริ่มต้น
+const DEFAULT_PLANT = 'D050';   // โรงงานเริ่มต้น
 const PLANT_NAMES = {
   D010: 'D010 คลังพัสดุ อุดรธานี', D020: 'D020 คลังพัสดุ หนองคาย', D030: 'D030 คลังพัสดุ ขอนแก่น',
   D040: 'D040 คลังพัสดุ เลย', D050: 'D050 คลังพัสดุ สกลนคร', D060: 'D060 คลังพัสดุ นครพนม',
@@ -224,7 +224,7 @@ const numCell = (v, cls = '') => {
 };
 const locKey = l => l === '' ? BLANK : l;
 const locLabel = l => l === '' ? BLANK_LABEL : l;
-const plantOf = r => r.Plant || DEFAULT_PLANT;          // data.js เก่าที่ยังไม่มี Plant = D060
+const plantOf = r => r.Plant || DEFAULT_PLANT;          // data.js เก่าที่ยังไม่มี Plant = D050
 const plantLabel = p => PLANT_NAMES[p] || p;
 const cmp = (a, b) => a < b ? -1 : a > b ? 1 : 0;      // เร็วกว่า localeCompare มาก
 // หน่วงการวาดตาราง (รวมการติ๊กหลายครั้งเป็นรอบเดียว) ป้องกันหน้าค้างเมื่อข้อมูลหลายโรงงาน
@@ -262,7 +262,7 @@ window.addEventListener('click', e => {
   document.querySelectorAll('.dd').forEach(d => { if (!d.contains(e.target)) d.classList.remove('open'); });
 });
 
-// ── โรงงาน (เลือกได้หลายแห่ง / ค่าเริ่มต้น D060) ──
+// ── โรงงาน (เลือกได้หลายแห่ง / ค่าเริ่มต้น D050) ──
 function buildPlantList() {
   const plantMats = {};
   mb52Data.forEach(r => { (plantMats[plantOf(r)] = plantMats[plantOf(r)] || new Set()).add(r.Mat); });
@@ -328,7 +328,7 @@ function locPreset(kind) {
   locChanged();
 }
 
-// ── Reset (กลับไปค่าเริ่มต้น: โรงงาน D060) ──
+// ── Reset (กลับไปค่าเริ่มต้น: โรงงาน D050) ──
 function resetFilters() {
   document.getElementById('categoryFilter').value = 'ALL';
   document.getElementById('batchFilter').value = 'ALL';

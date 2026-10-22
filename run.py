@@ -141,12 +141,24 @@ def get_project_group(wbs):
     elif wbs.startswith('P-TDD02'): return 'คพจ2'
     return 'อื่นๆ'
 
+# ===== ชื่อย่อ กฟฟ. สังกัดคลัง D050 (สกลนคร) ใช้จับจากรหัส WBS =====
+# ลำดับใน dict คือลำดับที่ใช้ตรวจ และเป็นลำดับแสดงผลในหน้าเว็บ (BRANCH_ORDER)
+BRANCH_MAP = {
+    'SKK': 'สกลนคร',
+    'PNH': 'พรรณานิคม',
+    'AAN': 'อากาศอำนวย',
+    'KSM': 'กุสุมาลย์',
+    'KBK': 'กุดบาก',
+    'PPN': 'ภูพาน',
+    'KSP': 'โคกศรีสุพรรณ',
+    'PKW': 'โพนนาแก้ว',
+    'TNG': 'เต่างอย',
+}
+
 def get_branch(wbs):
     wbs = str(wbs).upper()
-    if 'NPN' in wbs: return 'นครพนม'
-    if 'TPN' in wbs: return 'ธาตุพนม'
-    if 'NGE' in wbs: return 'นาแก'
-    if 'BPG' in wbs: return 'บ้านแพง'
+    for code, name in BRANCH_MAP.items():
+        if code in wbs: return name
     return 'อื่นๆ'
 
 def get_team(name):
@@ -158,7 +170,7 @@ def get_team(name):
 target_locs = ['0021', '0022', '0023', '0024', '0025', '6001', '6002', '6003', '6004', '6006', '6007', '6008', '6009', '6010', '6011']
 df_stock['ที่เก็บสินค้า'] = df_stock['ที่เก็บสินค้า'].astype(str).str.split('.').str[0].str.zfill(4)
 
-stock_summary = df_stock[(df_stock['โรงงาน'] == 'D060') & (df_stock['ที่เก็บสินค้า'].isin(target_locs))].groupby('วัสดุ')['ที่ใช้ได้'].sum().reset_index().rename(columns={'ที่ใช้ได้': 'Stock'})
+stock_summary = df_stock[(df_stock['โรงงาน'] == 'D050') & (df_stock['ที่เก็บสินค้า'].isin(target_locs))].groupby('วัสดุ')['ที่ใช้ได้'].sum().reset_index().rename(columns={'ที่ใช้ได้': 'Stock'})
 
 df_demand_pending = df_demand[df_demand['ปริมาณผลต่าง'] > 0].copy()
 if not df_demand_pending.empty:
@@ -266,7 +278,7 @@ for col in project_cols:
     if col not in final_df.columns: final_df[col] = 0
 
 # ===== ข้อมูลสต็อก MB52 เฉพาะผลิตภัณฑ์คอนกรีต (แยกคลัง/แบทช์) สำหรับหน้า concrete.html =====
-df_stock_conc = df_stock[(df_stock['โรงงาน'] == 'D060') & (df_stock['ที่เก็บสินค้า'].isin(target_locs))].copy()
+df_stock_conc = df_stock[(df_stock['โรงงาน'] == 'D050') & (df_stock['ที่เก็บสินค้า'].isin(target_locs))].copy()
 df_stock_conc = df_stock_conc[df_stock_conc['วัสดุ'].apply(get_category) == 'ผลิตภัณฑ์คอนกรีต']
 df_stock_conc = ensure_cols(df_stock_conc, ['แบทช์'], '')
 df_stock_conc['แบทช์'] = df_stock_conc['แบทช์'].astype(str).str.strip().replace('', '-')
@@ -277,7 +289,7 @@ concrete_stock.rename(columns={'คำอธิบายวัสดุ': 'MatDe
 concrete_stock_data = concrete_stock[['วัสดุ', 'MatDesc', 'Batch', 'Loc', 'Qty']].to_dict(orient='records')
 
 # ===== ข้อมูล MB52 ทุกโรงงาน (ทุกที่เก็บ/แบทช์) สำหรับหน้า mb52.html =====
-# หน้า mb52.html เลือกโรงงานเองได้ (ค่าเริ่มต้น D060) จึงต้องส่งข้อมูลทุกโรงงาน พร้อมฟิลด์ Plant
+# หน้า mb52.html เลือกโรงงานเองได้ (ค่าเริ่มต้น D050) จึงต้องส่งข้อมูลทุกโรงงาน พร้อมฟิลด์ Plant
 df_mb = read_sap_txt(file_mb52)
 df_mb.rename(columns={'Plnt': 'โรงงาน', 'SLoc': 'ที่เก็บสินค้า', 'BUn': 'หน่วย'}, inplace=True)
 mb_num_cols = ['ที่ใช้ได้', 'การส่ง/การโอน', 'ในการตรวจสอบคุณภาพ', 'การใช้ที่จำกัด', 'ระงับ', 'ส่งคืน']
@@ -334,7 +346,7 @@ wbs_details['Status_Short'] = wbs_details['สถานะ'].apply(get_short_sta
 wbs_details.rename(columns={'องค์ประกอบ WBS': 'WBS', 'โครงข่าย': 'Network', 'ปริมาณผลต่าง': 'Qty', 'ชื่อ': 'Project_Name', 'Status_Short': 'Status', 'ผู้สมัคร': 'Applicant'}, inplace=True)
 wbs_details['Network'] = wbs_details['Network'].fillna('-').astype(str).str.replace(r'\.0$', '', regex=True)
 
-df_me2n_in = df_me2n[df_me2n['โรงงาน'] == 'D060'].copy() if not df_me2n.empty else pd.DataFrame()
+df_me2n_in = df_me2n[df_me2n['โรงงาน'] == 'D050'].copy() if not df_me2n.empty else pd.DataFrame()
 if not df_me2n_in.empty:
     df_me2n_in['ยังจะถูกส่งมอบ (ปริมาณ)'] = df_me2n_in['ยังจะถูกส่งมอบ (ปริมาณ)'].apply(parse_sap_num)
     df_me2n_in['ที่เก็บสินค้า'] = df_me2n_in['ที่เก็บสินค้า'].astype(str).str.split('.').str[0].apply(lambda x: x.zfill(4) if x.isdigit() else '-')
@@ -345,7 +357,7 @@ me2n_summary = me2n_active.groupby(['วัสดุ', 'ข้อความส
 me2n_details = me2n_active[['เอกสารการจัดซื้อ', 'ผู้ขาย/โรงงานผู้จัดหาวัสดุ', 'ที่เก็บสินค้า', 'วัสดุ', 'ข้อความสั้น', 'ยังจะถูกส่งมอบ (ปริมาณ)', 'ข้อความส่วนหัว', 'Category']] if not me2n_active.empty else pd.DataFrame()
 me2n_vendors = sorted([str(v) for v in me2n_active['ผู้ขาย/โรงงานผู้จัดหาวัสดุ'].unique() if str(v) != '-ไม่ระบุ-']) if not me2n_active.empty else []
 
-df_me2n_out = df_me2n[df_me2n['ผู้ขาย/โรงงานผู้จัดหาวัสดุ'].astype(str).str.contains('D060', na=False, case=False)].copy() if not df_me2n.empty else pd.DataFrame()
+df_me2n_out = df_me2n[df_me2n['ผู้ขาย/โรงงานผู้จัดหาวัสดุ'].astype(str).str.contains('D050', na=False, case=False)].copy() if not df_me2n.empty else pd.DataFrame()
 if not df_me2n_out.empty:
     df_me2n_out['ยังจะถูกส่งมอบ (ปริมาณ)'] = df_me2n_out['ยังจะถูกส่งมอบ (ปริมาณ)'].apply(parse_sap_num)
     df_me2n_out['ที่เก็บสินค้า'] = df_me2n_out['ที่เก็บสินค้า'].astype(str).str.split('.').str[0].apply(lambda x: x.zfill(4) if x.isdigit() else '-')
@@ -417,7 +429,7 @@ def process_budget_file(file_path, file_type):
 
                     col_remain_11 = get_val(14)
                     show = False
-                    if 'NPN' in wbs: show = True
+                    if any(code in wbs.upper() for code in BRANCH_MAP): show = True
                     elif file_type == 'C' and ('AED' in wbs or 'POP' in wbs): show = True
 
                     if col_remain_11 > 0 and show:

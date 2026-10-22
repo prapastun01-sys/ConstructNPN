@@ -162,7 +162,7 @@
         <!-- ตารางที่ 2 : MB52 -->
         <div style="display: flex; justify-content: space-between; align-items: center; border-top: 2px dashed #eee; padding-top: 15px; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 15px;">
-                <h3 style="margin: 0; color:#16a085;">📦 ตารางที่ 2: ยอดคงคลัง MB52 (D060 แยกที่เก็บ / แบตช์)</h3>
+                <h3 style="margin: 0; color:#16a085;">📦 ตารางที่ 2: ยอดคงคลัง MB52 (D050 แยกที่เก็บ / แบตช์)</h3>
                 <button class="btn-export" onclick="exportToExcel('tableStock', 'Concrete_MB52')">📥 Export Excel (.xlsx)</button>
             </div>
             <div style="display: flex; gap: 15px; background: #e8f8f5; padding: 5px 12px; border-radius: 6px; border: 1px solid #a3e4d7; align-items:center;">
@@ -215,7 +215,7 @@
 
 <script>
     const CONCRETE_CAT = 'ผลิตภัณฑ์คอนกรีต';
-    const BRANCH_ORDER = ['ธาตุพนม', 'นครพนม', 'นาแก', 'บ้านแพง'];
+    const BRANCH_ORDER = ['สกลนคร', 'พรรณานิคม', 'อากาศอำนวย', 'กุสุมาลย์', 'กุดบาก', 'ภูพาน', 'โคกศรีสุพรรณ', 'โพนนาแก้ว', 'เต่างอย'];
     const GROUP_ORDER = ['คพจ', 'คพพ', 'คฟม', 'ผู้ใช้ไฟ', 'ลงทุน', 'อื่นๆ'];
 
     let wbsInfoMap = {};     // WBS -> ข้อมูลโครงการ
@@ -418,7 +418,7 @@
             });
         });
         h1 += `<th rowspan="2" style="background:#d35400;">รวมความต้องการ</th>
-               <th rowspan="2" style="background:#27ae60;">สต็อก D060</th>
+               <th rowspan="2" style="background:#27ae60;">สต็อก D050</th>
                <th rowspan="2" style="background:#8e44ad;">จัดสรร<br><span style="font-size:10px;">(รอนำเข้า)</span></th>
                <th rowspan="2" style="background:#2980b9;">จัดซื้อ<br><span style="font-size:10px;">(รอรับของ)</span></th>
                <th rowspan="2" style="background:#c0392b;">ขาด/เหลือ</th></tr>`;

@@ -142,7 +142,7 @@
             </div>
             <div class="card">
                 <h3>🎯 ความพร้อมของวัสดุ (นับตามรายการ)</h3>
-                <div class="hint">สต็อก D060 + จัดสรร (ME2N) + จัดซื้อ (PR/PO) เทียบกับความต้องการ</div>
+                <div class="hint">สต็อก D050 + จัดสรร (ME2N) + จัดซื้อ (PR/PO) เทียบกับความต้องการ</div>
                 <div class="chart-box"><canvas id="coverChart"></canvas></div>
             </div>
         </div>
@@ -198,7 +198,7 @@
     </div>
 
 <script>
-    const BRANCH_ORDER = ['ธาตุพนม', 'นครพนม', 'นาแก', 'บ้านแพง'];
+    const BRANCH_ORDER = ['สกลนคร', 'พรรณานิคม', 'อากาศอำนวย', 'กุสุมาลย์', 'กุดบาก', 'ภูพาน', 'โคกศรีสุพรรณ', 'โพนนาแก้ว', 'เต่างอย'];
     const GROUP_COLORS = {
         'คพจ1': '#95a5a6', 'คพจ2': '#7f8c8d', 'คพพ': '#16a085', 'คฟม': '#8e44ad',
         'ผู้ใช้ไฟ 68': '#85c1e9', 'ผู้ใช้ไฟ 69': '#2980b9',
@@ -566,7 +566,7 @@
             data: {
                 labels: top.map(lab),
                 datasets: [
-                    { label: 'สต็อก D060', data: p('covStock'), backgroundColor: C.stock },
+                    { label: 'สต็อก D050', data: p('covStock'), backgroundColor: C.stock },
                     { label: 'จัดสรร (รอนำเข้า)', data: p('covAlloc'), backgroundColor: C.alloc },
                     { label: 'จัดซื้อ (รอรับของ)', data: p('covPo'), backgroundColor: C.po },
                     { label: 'ยังขาด', data: p('short'), backgroundColor: C.short }
