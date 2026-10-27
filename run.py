@@ -370,7 +370,25 @@ alloc_details = alloc_active[['เอกสารการจัดซื้อ'
 alloc_plants = sorted([str(v) for v in alloc_active['โรงงาน'].unique() if str(v) != '-ไม่ระบุ-']) if not alloc_active.empty else []
 
 me2n1_due_dates = {}
+po_vendor_map = {}   # ชื่อบริษัท (ผู้ขาย) ของแต่ละ PO จาก 13.ME2N1.txt  key = "PO" และ "PO_วัสดุ"
+
+def clean_vendor_name(v):
+    """'843244     บริษัท อีซี่ บาร์เทอร์ เอ็กซ์ตร้า' -> 'บริษัท อีซี่ บาร์เทอร์ เอ็กซ์ตร้า' (ตัดรหัสผู้ขายนำหน้าออก)"""
+    v = str(v).strip()
+    if not v or v.lower() in ('nan', '-', '-ไม่ระบุ-'): return ''
+    v = re.sub(r'^[A-Za-z]?\d+\s+', '', v).strip()
+    return re.sub(r'\s+', ' ', v)
+
 if not df_me2n1.empty:
+    if 'ผู้ขาย/โรงงานผู้จัดหาวัสดุ' in df_me2n1.columns and 'เอกสารการจัดซื้อ' in df_me2n1.columns:
+        for _, r in df_me2n1.iterrows():
+            po_id = str(r['เอกสารการจัดซื้อ']).split('.')[0].strip()
+            mat_id = str(r.get('วัสดุ', '')).strip()
+            v_name = clean_vendor_name(r['ผู้ขาย/โรงงานผู้จัดหาวัสดุ'])
+            if po_id and v_name:
+                po_vendor_map.setdefault(po_id, v_name)
+                if mat_id: po_vendor_map[f"{po_id}_{mat_id}"] = v_name
+
     if 'วันที่ส่งมอบ' in df_me2n1.columns and 'เอกสารการจัดซื้อ' in df_me2n1.columns:
         for _, r in df_me2n1.iterrows():
             po_id = str(r['เอกสารการจัดซื้อ']).split('.')[0].strip()
@@ -488,7 +506,12 @@ for line in lines:
                 qty = po_qty if has_po and po_qty > 0 else pr_qty
                 price = po_price if has_po and po_price > 0 else pr_price
                 amount = qty * price
-                company_name = vendor_map.get(vendor, vendor) if vendor else '-'
+                # ชื่อบริษัท: ดึงจาก 13.ME2N1.txt ตามเลข PO ก่อน (ตรง PO+วัสดุ → PO) ถ้าไม่เจอใช้ค่าจาก z005 / n-z005
+                company_name = '-'
+                if doc_type == 'PO':
+                    company_name = po_vendor_map.get(f"{doc_num}_{mat}", po_vendor_map.get(doc_num, '-'))
+                if company_name == '-' and vendor:
+                    company_name = vendor_map.get(vendor, vendor)
 
                 due_date_str = '-'; overdue_days = '-'
                 if doc_type == 'PO':
