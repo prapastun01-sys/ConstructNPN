@@ -477,6 +477,7 @@ for line in lines:
         parts = line.split('|')
         if len(parts) >= 2: vendor_map[parts[0].strip()] = parts[1].strip()
 
+PO_DUE_DAYS = 30   # จำนวนวันที่บวกจากวันที่ทำสัญญา PO เพื่อหาวันครบกำหนด (แก้ตัวเลขนี้ที่เดียว)
 current_date = datetime.now(timezone(timedelta(hours=7))).replace(tzinfo=None, hour=0, minute=0, second=0, microsecond=0)  # วันที่ปัจจุบัน (เวลาไทย) ใช้คำนวณวันเลยกำหนดส่งมอบ PO
 
 try:
@@ -513,11 +514,20 @@ for line in lines:
                 if company_name == '-' and vendor:
                     company_name = vendor_map.get(vendor, vendor)
 
+                # วันครบกำหนด PO = วันที่ทำสัญญา PO (PO Date) + PO_DUE_DAYS วัน
+                # (วันส่งมอบใน 13.ME2N1.txt ไม่ใช้ เพราะ SAP ตั้งไว้ไม่แน่นอน บางใบเท่ากับวันที่ PO)
+                # ถ้าอ่านวันที่ PO ไม่ได้ จึงถอยไปใช้วันส่งมอบจาก 13.ME2N1.txt
                 due_date_str = '-'; overdue_days = '-'
                 if doc_type == 'PO':
-                    due_info = me2n1_due_dates.get(f"{doc_num}_{mat}", me2n1_due_dates.get(doc_num))
-                    if due_info:
-                        due_date_str, due_date_obj = due_info
+                    due_date_obj = None
+                    try:
+                        due_date_obj = datetime.strptime(po_date_str, '%d.%m.%Y') + timedelta(days=PO_DUE_DAYS)
+                        due_date_str = due_date_obj.strftime('%d.%m.%Y')
+                    except (ValueError, TypeError):
+                        due_info = me2n1_due_dates.get(f"{doc_num}_{mat}", me2n1_due_dates.get(doc_num))
+                        if due_info:
+                            due_date_str, due_date_obj = due_info
+                    if due_date_obj:
                         diff = (current_date - due_date_obj).days
                         overdue_days = diff if diff > 0 else 0
 
